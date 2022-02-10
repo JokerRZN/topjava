@@ -18,8 +18,8 @@
             <th></th>
             <th></th>
         </tr>
-        <jsp:useBean id="meals" scope="request" type="java.util.List"/>
-        <c:forEach items="${meals}" var="meal">
+        <c:forEach items="${meals}" var="meal1">
+            <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.MealTo"/>
             <fmt:parseDate value="${meal.dateTime}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both"/>
             <fmt:formatDate value="${parsedDateTime}" var="dateTime" pattern="yyyy-MM-dd HH:mm" />
             <tr style="color:${meal.excess ? 'red' : 'green'}">
