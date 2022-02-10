@@ -4,14 +4,13 @@
 <html>
 <head>
     <title>Meals</title>
-    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <h3><a href="index.html">HOME</a></h3>
 
 <hr>
 <h2>Meals</h2>
-    <table border="1" cellpadding="5">
+    <table border="1" padding="5">
         <tr>
             <th>Date</th>
             <th>Description</th>
