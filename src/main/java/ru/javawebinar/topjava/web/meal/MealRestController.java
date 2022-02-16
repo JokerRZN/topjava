@@ -1,39 +1,61 @@
 package ru.javawebinar.topjava.web.meal;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.DateTimeUtil;
+import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
-import java.util.Collection;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 @Controller
 public class MealRestController {
+    private static final Logger log = LoggerFactory.getLogger(MealRestController.class);
 
-    @Autowired
-    private final MealService service;
+    private MealService service;
 
     public MealRestController(MealService service) {
         this.service = service;
     }
 
-    public Collection<Meal> getAll(int userId) {
-        return service.getAll(userId);
+    public List<MealTo> getAll() {
+        log.debug("getAll");
+        List<Meal> userMeal = service.getAll(SecurityUtil.authUserId());
+        return MealsUtil.getTos(userMeal, SecurityUtil.authUserCaloriesPerDay());
     }
 
-    public Meal get(int userId, int id) {
-        return service.get(userId, id);
+    public List<MealTo> getMealTos(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
+        log.debug("getMealTos");
+        List<Meal> userMeal = service.getAll(SecurityUtil.authUserId());
+        return MealsUtil.filterByPredicate(userMeal,
+                SecurityUtil.authUserCaloriesPerDay(), meal -> meal.getDate().isAfter(startDate)
+                        && meal.getDate().isBefore(endDate)
+                        && DateTimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime));
     }
 
-    public void delete(int userId, int id) {
-        service.delete(userId, id);
+    public Meal get(int id) {
+        log.debug("get meal by id");
+        return service.get(SecurityUtil.authUserId(), id);
     }
 
-    public void update(int userId, Meal meal) {
-        service.update(userId, meal);
+    public void delete(int id) {
+        log.debug("delete meal by id");
+        service.delete(SecurityUtil.authUserId(), id);
+    }
+
+    public void update(Meal meal) {
+        log.debug("update meal by id");
+        service.update(SecurityUtil.authUserId(), meal);
     }
 
     public void create(Meal meal) {
-        service.create(meal.getUserId(), meal);
+        log.debug("create meal");
+        service.create(SecurityUtil.authUserId(), meal);
     }
 }

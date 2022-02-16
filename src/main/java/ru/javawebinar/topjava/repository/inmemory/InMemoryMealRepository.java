@@ -4,8 +4,9 @@ import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.web.SecurityUtil;
 
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,11 +17,16 @@ public class InMemoryMealRepository implements MealRepository {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.meals.forEach(meal -> this.save(SecurityUtil.authUserId(), meal));
+        MealsUtil.meals.forEach(meal -> this.save(1, meal));
+        MealsUtil.meals.forEach(meal -> save(2, meal));
+        save(2, new Meal(LocalDateTime.of(2021, Month.JANUARY, 30, 10, 0), "Завтрак", 500));
+        save(2, new Meal(LocalDateTime.of(2021, Month.JANUARY, 30, 13, 0), "Обед", 1000));
+        save(2, new Meal(LocalDateTime.of(2021, Month.JANUARY, 30, 20, 0), "Ужин", 500));
+
     }
 
     @Override
-    public Meal save(int userId ,Meal meal) {
+    public Meal save(int userId, Meal meal) {
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
             repository.put(meal.getId(), meal);
@@ -51,10 +57,7 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public Collection<Meal> getAll(int userId) {
-        if (userId != SecurityUtil.authUserId()) {
-            return null;
-        }
+    public List<Meal> getAll(int userId) {
         List<Meal> mealList = new ArrayList<>(repository.values());
         mealList.sort(Comparator.comparing(Meal::getDate));
         Collections.reverse(mealList);
