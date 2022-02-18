@@ -5,11 +5,10 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryMealRepository implements MealRepository {
@@ -19,10 +18,6 @@ public class InMemoryMealRepository implements MealRepository {
     {
         MealsUtil.meals.forEach(meal -> this.save(1, meal));
         MealsUtil.meals.forEach(meal -> save(2, meal));
-        save(2, new Meal(LocalDateTime.of(2021, Month.JANUARY, 30, 10, 0), "Завтрак", 500));
-        save(2, new Meal(LocalDateTime.of(2021, Month.JANUARY, 30, 13, 0), "Обед", 1000));
-        save(2, new Meal(LocalDateTime.of(2021, Month.JANUARY, 30, 20, 0), "Ужин", 500));
-
     }
 
     @Override
@@ -40,17 +35,17 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public boolean delete(int userId, int id) {
-        Meal meal = repository.get(id);
-        if (meal.getUserId() == userId) {
-            return repository.remove(id) != null;
+        Meal meal = get(userId, id);
+        if (meal == null || meal.getUserId() != userId) {
+            return false;
         }
-        return false;
+        return repository.remove(id) != null;
     }
 
     @Override
     public Meal get(int userId, int id) {
         Meal meal = repository.get(id);
-        if (meal.getUserId() != userId) {
+        if (meal == null || meal.getUserId() != userId) {
             return null;
         }
         return repository.get(id);
@@ -58,8 +53,10 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        List<Meal> mealList = new ArrayList<>(repository.values());
-        mealList.sort(Comparator.comparing(Meal::getDate));
+        List<Meal> mealList = repository.values()
+                .stream()
+                .sorted(Comparator.comparing(Meal::getDate))
+                .collect(Collectors.toList());
         Collections.reverse(mealList);
         return mealList;
     }
