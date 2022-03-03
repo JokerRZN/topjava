@@ -25,7 +25,7 @@ public class Meal extends AbstractBaseEntity {
     public static final String BETWEEN = "Meal.getBetween";
     public static final String ALL_SORTED = "Meal.getAllSorted";
 
-    @Column(name = "date_time", nullable = false, updatable = false)
+    @Column(name = "date_time", nullable = false)
     @NotNull
     private LocalDateTime dateTime;
 
