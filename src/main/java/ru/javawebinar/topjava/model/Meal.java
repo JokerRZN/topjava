@@ -1,17 +1,17 @@
 package ru.javawebinar.topjava.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @NamedQueries({
-        @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m where m.user.id =: user_id and m.id =: id"),
-        @NamedQuery(name = Meal.GET_BY_ID, query = "select m from Meal m where m.user.id =: user_id and m.id =: id"),
-        @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m LEFT JOIN FETCH m.user where m.user.id =: user_id ORDER BY m.dateTime desc"),
-        @NamedQuery(name = Meal.BETWEEN, query = "select m from Meal m where m.user.id =: user_id and m.dateTime >=: start_date and m.dateTime <: end_date ORDER BY m.dateTime desc")
+        @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.user.id =: user_id AND m.id =: id"),
+        @NamedQuery(name = Meal.GET_BY_ID, query = "SELECT m FROM Meal m WHERE m.user.id =: user_id AND m.id =: id"),
+        @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m LEFT JOIN FETCH m.user WHERE m.user.id =: user_id ORDER BY m.dateTime desc"),
+        @NamedQuery(name = Meal.BETWEEN, query = "SELECT m FROM Meal m WHERE m.user.id =: user_id AND m.dateTime >=: start_date AND m.dateTime <: end_date ORDER BY m.dateTime desc")
 })
 @Entity
 @Table(name = "meals")
@@ -22,20 +22,21 @@ public class Meal extends AbstractBaseEntity {
     public static final String BETWEEN = "Meal.getBetween";
     public static final String ALL_SORTED = "Meal.getAllSorted";
 
-    @Column(name = "date_time", nullable = false, columnDefinition = "timestamp default now()", updatable = false, unique = true)
+    @Column(name = "date_time", nullable = false, updatable = false)
     @NotNull
     private LocalDateTime dateTime;
 
     @Column(name = "description", nullable = false)
-    @NotNull
-    @Size(min = 1, max = 100, message = "Description must be between 1 and 100 characters")
+    @NotEmpty
     private String description;
 
     @Column(name = "calories", nullable = false)
     @NotNull
     private int calories;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="user_id")
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     public Meal() {
