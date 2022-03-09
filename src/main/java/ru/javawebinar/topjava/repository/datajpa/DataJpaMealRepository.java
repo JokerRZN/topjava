@@ -30,10 +30,10 @@ public class DataJpaMealRepository implements MealRepository {
         if (meal.isNew()) {
             em.persist(meal);
             return meal;
-        } else if (get(meal.id(), userId) == null) {
-            return null;
+        } else if (get(meal.id(), userId) != null) {
+            return em.merge(meal);
         }
-        return em.merge(meal);
+        return null;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class DataJpaMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        return crudRepository.getById(id, userId);
+        return crudRepository.getByIdAndUserId(id, userId);
     }
 
     @Override

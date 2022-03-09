@@ -21,14 +21,6 @@ public abstract class MealServiceTest extends ServiceTest {
     @Autowired
     private MealService service;
 
-    @Autowired
-    private CacheManager cacheManager;
-
-    @Before
-    public void setup() {
-        Objects.requireNonNull(cacheManager.getCache("meals")).clear();
-    }
-
     @Test
     public void delete() {
         service.delete(MEAL1_ID, USER_ID);
