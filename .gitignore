@@ -6,3 +6,7 @@ log
 *.patch
 
 
+/mem/topjava.lck
+/mem/topjava.log
+/mem/topjava.properties
+/mem/topjava.script
