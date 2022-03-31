@@ -9,7 +9,8 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -38,9 +39,9 @@ public class MealRestController extends AbstractMealController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Meal> createWithLocation(@RequestBody Meal meal) {
-        Meal meal1 = super.create(meal);
-        URI uriNew = ServletUriComponentsBuilder.fromCurrentContextPath().path(URL + "/{id}").buildAndExpand(meal1.getId()).toUri();
-        return ResponseEntity.created(uriNew).body(meal1);
+        Meal createdMeal = super.create(meal);
+        URI uriNew = ServletUriComponentsBuilder.fromCurrentContextPath().path(URL + "/{id}").buildAndExpand(createdMeal.getId()).toUri();
+        return ResponseEntity.created(uriNew).body(createdMeal);
     }
 
     @Override
@@ -51,8 +52,12 @@ public class MealRestController extends AbstractMealController {
     }
 
 
+    @Override
     @GetMapping("/filter")
-    public List<MealTo> getBetween(@RequestParam(required = false) LocalDateTime startLocalDateTime, @RequestParam(required = false) LocalDateTime endLocalDateTime) {
-        return super.getBetween(startLocalDateTime.toLocalDate(), startLocalDateTime.toLocalTime(), endLocalDateTime.toLocalDate(), endLocalDateTime.toLocalTime());
+    public List<MealTo> getBetween(@RequestParam(required = false) LocalDate startDate,
+                                   @RequestParam(required = false) LocalTime startTime,
+                                   @RequestParam(required = false) LocalDate endDate,
+                                   @RequestParam(required = false) LocalTime endTime) {
+        return super.getBetween(startDate, startTime, endDate, endTime);
     }
 }

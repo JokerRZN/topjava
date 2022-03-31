@@ -5,19 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.javawebinar.topjava.MatcherFactory;
 import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
-import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
-import java.net.URL;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,7 +21,6 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 import static ru.javawebinar.topjava.web.meal.MealRestController.URL;
 
 class MealRestControllerTest extends AbstractControllerTest {
-    MatcherFactory.Matcher<MealTo> matcher = MatcherFactory.usingIgnoringFieldsComparator(MealTo.class);
 
     @Autowired
     private MealService mealService;
@@ -36,12 +30,12 @@ class MealRestControllerTest extends AbstractControllerTest {
         perform(MockMvcRequestBuilders.get(URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(matcher.contentJson(mealTos));
+                .andExpect(MEAL_TO_MATCHER.contentJson(mealTos));
     }
 
     @Test
     void get() throws Exception {
-        perform(MockMvcRequestBuilders.get(URL+ "/" + MEAL1_ID))
+        perform(MockMvcRequestBuilders.get(URL + "/" + MEAL1_ID))
                 .andExpect(status().isOk())
                 .andExpect(MEAL_MATCHER.contentJson(meal1));
     }
@@ -77,5 +71,29 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
         MEAL_MATCHER.assertMatch(mealService.get(MEAL1_ID, USER_ID), meal);
+    }
+
+    @Test
+    void getBetweenInclusive() throws Exception {
+        ResultActions actions = perform(MockMvcRequestBuilders.get(URL + "/filter")
+                .param("startDate", "2020-01-31")
+                .param("startTime", "09:00")
+                .param("endDate", "2020-01-31")
+                .param("endTime", "21:00"))
+                .andDo(print())
+                .andExpect(status().isOk());
+        System.out.println("aaa");
+
+                //.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                //.andExpect(matcher.contentJson(mealTos.subList(4, 6)));
+    }
+
+    @Test
+    void getBetweenWithNullDates() throws Exception {
+        perform(MockMvcRequestBuilders.get(URL + "/filter"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(MEAL_TO_MATCHER.contentJson(mealTos));
     }
 }
