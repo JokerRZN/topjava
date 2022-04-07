@@ -31,8 +31,6 @@
                            <input class="form-control" name="endTime" id="endTime" autocomplete="off" type="time">
                        </div>
                    </div>
-
-
                </form>
            </div>
         </div>
@@ -92,7 +90,6 @@
                         <input type="datetime-local" class="form-control" id="dateTime" name="dateTime"
                                placeholder="<spring:message code="meal.dateTime"/>">
                     </div>
-
                     <div class="form-group">
                         <label for="description" class="col-form-label"><spring:message
                                 code="meal.description"/></label>
