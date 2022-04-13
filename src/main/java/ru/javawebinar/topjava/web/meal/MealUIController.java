@@ -38,7 +38,6 @@ public class MealUIController extends AbstractMealController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public void createOrUpdate(@Valid MealTo mealTo, BindingResult result) {
         if (result.hasErrors()) {
             String errorFieldsMsg = result.getFieldErrors().stream().map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
